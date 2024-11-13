@@ -1,0 +1,46 @@
+/* Estilos de la barra de desplazamiento */
+.custom-scrollbar {
+    overflow-y: auto; /* Habilitar el scroll vertical */
+  }
+  
+  /* Ocultar scrollbar por defecto en navegadores WebKit (Chrome, Safari) */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 12px; /* Ancho de la barra de desplazamiento */
+    opacity: 0; /* Hacerla invisible inicialmente */
+    transition: opacity 0.3s; /* Transición suave al hacer hover */
+  }
+  
+  /* Estilo del track (fondo de la barra de desplazamiento) */
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: #4c1d95; /* Color de fondo */
+    border-radius: 10px;
+  }
+  
+  /* Estilo del pulgar (parte desplazable) */
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: #a78bfa; /* Color del pulgar */
+    border-radius: 10px; /* Redondeo de los bordes */
+    border: 3px solid #4c1d95; /* Borde alrededor del pulgar */
+  }
+  
+  /* Estilo del pulgar al hacer hover */
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background-color: #7c3aed; /* Cambiar color en hover */
+  }
+  
+  /* Mostrar scrollbar al hacer hover sobre el aside */
+  .custom-scrollbar:hover::-webkit-scrollbar {
+    opacity: 1; /* Mostrar scrollbar */
+  }
+  
+  /* Ocultar scrollbar en Firefox */
+  .custom-scrollbar {
+    scrollbar-width: thin; /* Hacer scrollbar más delgada en Firefox */
+    scrollbar-color: #a78bfa #4c1d95; /* Pulgar y fondo del track */
+  }
+  
+  /* Mostrar scrollbar al hacer hover en Firefox */
+  .custom-scrollbar:hover {
+    scrollbar-color: #7c3aed #4c1d95; /* Cambiar pulgar color en hover */
+  }
+  

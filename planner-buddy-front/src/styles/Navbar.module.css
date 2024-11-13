@@ -1,0 +1,218 @@
+.header{
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 0.5rem;
+  gap: 0.5 rem;
+  background-color: #fdf2e9;
+  height: fit-content;
+}
+
+.header .burger{
+  display: block;
+  width: 1.5rem;
+  height: 1.5rem;
+  cursor: pointer;
+}
+.burger{
+  width: 2rem;
+  height: 2rem;
+  cursor: pointer;
+}
+.bar{  
+  display: block;
+  content: '';
+  width: 80%;
+  height: 3px;
+  background-color: #4c1d95;
+  margin: 0.35rem -0.8rem;
+  transition: all 450ms;
+  margin: 0.35rem -0.8rem;
+}
+
+.burger.active .topBar{
+  transform: rotate(45deg) translate(-2px, -1px);
+  transform-origin: 0px 100%;
+}
+.burger.active .bottomBar{
+  transform: rotate(-225deg) translate(-4px, 9px);
+}
+.burger.active .bar{
+  opacity: 0;
+}
+
+.nav{
+  width: 100%;
+  background-color: #fdf2e9;
+  gap: 2rem;
+  height: 0;
+  overflow: hidden;
+  transition: all .5s ease;
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none;
+  margin: 0.2rem 0;
+  font-size: 2rem;
+}
+.nav.active{
+  height: 50vh;
+  pointer-events: auto;
+
+}
+.navList{
+  list-style-type: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.li {
+  margin: 1rem 0;
+}
+.a{
+  text-decoration: none;
+  color: #4c1d95;
+  background-color: transparent;
+  border: 2px #4c1d95 solid;
+  padding: 0.4rem;
+  border-radius: 3px;
+  display: block;
+  min-width: 300px;
+  text-align: center;
+  font-size: 1.2rem;
+}
+.a:hover {
+  background-color: #fdf2e9;
+}
+
+
+@media (width > 770px) {
+
+.header .burger{
+    display: none;
+}
+.header{
+    flex-flow: row nowrap;
+}
+.nav{
+    display: flex;
+    width: 100%;
+    height: auto;
+    pointer-events: auto;
+    margin: 0;
+    flex-direction: row;
+    justify-content: space-around;
+}
+
+.navList{
+    display: flex;
+    font-size: 1rem;
+    flex-direction: row;
+    gap: 3rem;
+
+}
+.li {
+    margin: 0;
+}
+
+.a {
+    min-width: auto;
+    background-color: transparent;
+    color: #fdf2e9;
+    border: none;
+    padding: 0;
+    font-size: 1rem;
+}
+
+.a:hover {
+  background-color: transparent;
+}
+.buttonsColl {
+  width: 90%;
+  margin: auto;
+  text-align: center;
+}
+.button {
+  margin: 0.85rem 2.3rem;
+}
+.customBtn {
+  padding: 10px 25px;
+  font-family: "Roboto", sans-serif;
+  font-weight: 500;
+  background: transparent;
+  outline: none !important;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  display: inline-block;
+  color: #4c1d95;
+}
+
+/**** BTN No. 6 ****/
+.btn6 {
+  width: 130px;
+  height: 40px;
+  line-height: 42px;
+  padding: 0;
+  border: none;
+}
+.btn6span {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.btn6:before,
+.btn6:after {
+  position: absolute;
+  content: "";
+  height: 0%;
+  width: 2px;
+  background:#4c1d95;
+}
+.btn6:before {
+  right: 0;
+  top: 0;
+  transition: all 0.1s ease;
+}
+.btn6:after {
+  left: 0;
+  bottom: 0;
+  transition: all 0.1s 0.2s ease;
+}
+.btn6:hover:before {
+  transition: all 0.1s 0.2s ease;
+  height: 100%;
+}
+.btn6:hover:after {
+  transition: all 0.1s ease;
+  height: 100%;
+}
+.btn6span:before,
+.btn6span:after {
+  position: absolute;
+  content: "";
+  background:#4c1d95;
+}
+.btn6span:before {
+  left: 0;
+  top: 0;
+  width: 0%;
+  height: 2px;
+  transition: all 0.1s 0.1s ease;
+}
+.btn6span:after {
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 2px;
+}
+.btn6span:hover:before {
+  width: 100%;
+}
+
+
+}

@@ -1,0 +1,45 @@
+.card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 16px;
+    max-width: 300px;
+    text-align: center;
+    margin: 10px;
+    background-color: #fff;
+  }
+  
+  .card-img {
+    border-radius: 8px;
+    object-fit: cover;
+  }
+  
+  .card-title {
+    font-size: 1.5rem;
+    margin: 16px 0 8px;
+  }
+  
+  .card-description {
+    color: #555;
+  }
+  
+  .container {
+    padding: 20px;
+  }
+  
+  .cards {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  
+  /* Responsive */
+  @media (max-width: 768px) {
+    .card {
+      max-width: 100%;
+    }
+    .cards {
+      flex-direction: column;
+      align-items: center;
+    }
+  }
+  

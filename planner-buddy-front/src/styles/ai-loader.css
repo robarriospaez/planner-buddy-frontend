@@ -1,0 +1,71 @@
+#preloader6 {
+    position: relative;
+    width: 60px; /* Incrementa el tamaño general */
+    height: 60px;
+    animation: preloader_6 5s infinite linear;
+    transform: translateY(-20px);
+  }
+  
+  #preloader6 span {
+    width: 50px;
+    height: 50px;
+    position: absolute;
+    top: 50%;
+    display: block;
+    animation: preloader_6_span 1s infinite linear;
+  }
+  
+  #preloader6 span:nth-child(1) {
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #4c1d95;
+  }
+  
+  #preloader6 span:nth-child(2) {
+    top: 50%;
+    left: 100%;
+    transform: translateY(-50%) translateX(-100%);
+    background: #4c1d95;
+    animation-delay: 0.2s;
+  }
+  
+  #preloader6 span:nth-child(3) {
+    top: 100%;
+    left: 50%;
+    transform: translate(-50%, -100%);
+    background: #4c1d95;
+    animation-delay: 0.4s;
+  }
+  
+  #preloader6 span:nth-child(4) {
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+    background: #4c1d95;
+    animation-delay: 0.6s;
+  }
+  
+  @keyframes preloader_6_span {
+    0% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(0.5);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+  
+.sparkle {
+  height: 300px;
+  width: 250px;
+  background: #4c1d95;
+  mask: radial-gradient(#0000 71%, #000 72%) 10000% 10000%/99.5% 99.5%;
+
+  /* if you will use a different unit than px consider round()
+   height: round(__,1px);
+   width: round(__,1px);
+  */
+}
