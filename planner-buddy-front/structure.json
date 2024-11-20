@@ -1,0 +1,7 @@
+{
+  "src": {
+    "store": {
+      "useCategoryIndexStore.ts": "import { create } from 'zustand';\nimport { persist, createJSONStorage } from 'zustand/middleware';\n\nconst useCategoryIndexStore = create(\n  persist(\n    (set, get) => ({\n      indexes: {},\n      setIndex: (eventId, category, index) => set((state) => ({\n        indexes: {\n          ...state.indexes,\n          [eventId]: {\n            ...(state.indexes[eventId] || {}),\n            [category]: index\n          }\n        }\n      })),\n      getIndex: (eventId, category) => {\n        const state = get();\n        return state.indexes[eventId]?.[category] || 0;\n      },\n    }),\n    {\n      name: 'category-index-storage',\n      storage: createJSONStorage(() => localStorage),\n    }\n  )\n);\n\nexport default useCategoryIndexStore;"
+    }
+  }
+}

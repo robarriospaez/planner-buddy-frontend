@@ -75,7 +75,7 @@ const CreateEvent = ({ refreshEvents }) => {
         if (joinResponse.ok) {
           // Obtener la cookie de 'eventIds' y parsearla como un array de números
           const eventIdsArray = Cookies.get("eventIds")
-            ? JSON.parse(Cookies.get("eventIds")).map(Number)
+            ? JSON.parse(Cookies.get("eventIds") as string).map(Number)
             : []; // Si no existe, devolvemos un array vacío
 
           // Agregar el nuevo eventId si no está ya en el array

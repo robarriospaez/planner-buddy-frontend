@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation"; // Update 2: Removed this line
 import Image from "next/image";
 import {
   BarChart,
   Bar,
   XAxis,
-  YAxis,
   Tooltip,
   ResponsiveContainer,
   Cell,
@@ -13,11 +12,27 @@ import {
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-const LikedItemsChart = ({ eventId, category }) => {
-  const router = useRouter();
-  const [likedItems, setLikedItems] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+interface LikedItem {
+  title: string;
+  likes: number;
+  urlImage: string;
+  [key: string]: string | number; // Update 1: Modified LikedItem interface
+}
+
+interface CategoryTitles {
+  [key: string]: string;
+}
+
+interface LikedItemsChartProps {
+  eventId: string;
+  category: 'movies' | 'meals' | 'places';
+}
+
+const LikedItemsChart: React.FC<LikedItemsChartProps> = ({ eventId, category }) => {
+  // const router = useRouter(); // Update 2: Removed this line
+  const [likedItems, setLikedItems] = useState<LikedItem[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     setLoading(true);
@@ -26,11 +41,11 @@ const LikedItemsChart = ({ eventId, category }) => {
         if (!res.ok) throw new Error("Failed to fetch data");
         return res.json();
       })
-      .then((data) => {
+      .then((data: LikedItem[]) => {
         setLikedItems(data);
         setLoading(false);
       })
-      .catch((error) => {
+      .catch((error: Error) => {
         console.error(`Error fetching liked ${category}:`, error);
         setError(error.message);
         setLoading(false);
@@ -50,7 +65,7 @@ const LikedItemsChart = ({ eventId, category }) => {
   if (error)
     return <div className="grid place-items-center">Error: {error}</div>;
 
-  const categoryTitles = {
+  const categoryTitles: CategoryTitles = {
     movies: "Películas",
     meals: "Comidas",
     places: "Lugares",
@@ -68,8 +83,7 @@ const LikedItemsChart = ({ eventId, category }) => {
             <BarChart data={likedItems}>
               <XAxis
                 dataKey="title"
-                tickFormatter={(value, index) => {
-                  // Encuentra el valor con más likes
+                tickFormatter={(value: string) => { // Update 3: Modified tickFormatter
                   const maxItem = likedItems.reduce((prev, current) =>
                     prev.likes > current.likes ? prev : current
                   );

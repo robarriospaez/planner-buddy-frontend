@@ -3,7 +3,7 @@
 import React from "react";
 import styles from "@/styles/Footer.module.css";
 
-const Footer = () => {
+const Footer: React.FC = () => {
   return (
     <footer className={styles.footer}>
       <div className="container mx-auto text-center">

@@ -1,49 +1,62 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import useAuthStore from "../store/useAuthStore.js";
+import useAuthStore from "../store/useAuthStore";
 import styles from "../styles/Navbar.module.css";
 
-const Navbar = () => {
+const Navbar: React.FC = () => {
   const router = useRouter();
   const logout = useAuthStore((state) => state.logout);
 
-  const handleLogout = () => {
+  const handleLogout = useCallback(() => {
     logout();
     router.push("/login");
-  };
+  }, [logout, router]);
 
   useEffect(() => {
-    const button = document.querySelector(`.${styles.burger}`);
-    const nav = document.querySelector(`.${styles.nav}`);
-    const burger = document.querySelector("#burger");
+    // Verificación de renderizado del lado del cliente
+    if (typeof window !== "undefined") {
+      const button = document.querySelector(
+        `.${styles.burger}`
+      ) as HTMLButtonElement;
+      const nav = document.querySelector(`.${styles.nav}`) as HTMLElement;
+      const burger = document.querySelector("#burger") as HTMLElement;
 
-    const toggleMenu = () => {
-      nav.classList.toggle(styles.active);
-      burger.classList.toggle("active");
-    };
-  
-    button.addEventListener("click", toggleMenu);
-  
-    // Cleanup event listeners on component unmount
-    return () => {
-      button.removeEventListener("click", toggleMenu);
-    };
+      const toggleMenu = () => {
+        nav.classList.toggle(styles.active);
+        burger.classList.toggle("active");
+      };
+
+      button.addEventListener("click", toggleMenu);
+
+      // Limpiar listeners de eventos al desmontar
+      return () => {
+        button.removeEventListener("click", toggleMenu);
+      };
+    }
   }, []);
+
   return (
     <header className={styles.header}>
-      <button className={styles.burger}>
+      <button className={styles.burger} aria-label="Toggle menu">
         <div id="burger">
-          <span id="top-bar" className={`${styles.topBar} ${styles.bar}`}></span>
+          <span
+            id="top-bar"
+            className={`${styles.topBar} ${styles.bar}`}
+          ></span>
           <span id="bar" className={styles.bar}></span>
-          <span id="bottom-bar" className={`${styles.bottomBar} ${styles.bar}`}></span>
+          <span
+            id="bottom-bar"
+            className={`${styles.bottomBar} ${styles.bar}`}
+          ></span>
         </div>
       </button>
       <nav className={styles.nav}>
         <h1
           className="text-2xl font-bold cursor-pointer text-violet-900"
-          onClick={() => router.push("/home")}>
+          onClick={() => router.push("/home")}
+        >
           Planner Buddy
         </h1>
         <ul className={styles.navList}>
@@ -61,21 +74,13 @@ const Navbar = () => {
               </button>
             </a>
           </li>
-          {/* <li className={styles.li}>
-            <a href="/user" className={styles.a}>
-              <button className={`${styles.customBtn} ${styles.btn6}`}>
-                <span className={styles.btn6span}>Usuario</span>
-              </button>
-            </a>
-          </li> */}
           <li className={styles.li}>
-            <a className={styles.a}>
             <button
               onClick={handleLogout}
-              className={`${styles.customBtn} ${styles.btn6}`}>
-                <span className={styles.btn6span}>Logout</span>
+              className={`${styles.customBtn} ${styles.btn6}`}
+            >
+              <span className={styles.btn6span}>Logout</span>
             </button>
-            </a>
           </li>
         </ul>
       </nav>
