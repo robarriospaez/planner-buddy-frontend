@@ -19,7 +19,7 @@ export async function POST(request) {
       message: `likes: ${movies.map(movie => movie.title).join(', ')}, places: ${places.map(place => place.title).join(', ')}, foods: ${foods.map(food => food.title).join(', ')}, dislikes: ${dislikes.map(dislike => dislike.title).join(', ')}`,
     });
 
-    const resultJSON = JSON.parse(response.text);
+    const resultJSON: string = JSON.parse(response.text);
     return NextResponse.json(resultJSON);
   } catch (error) {
     console.error(error);

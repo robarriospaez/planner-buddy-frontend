@@ -1,8 +1,14 @@
 import { useState } from 'react';
 
+interface IAResponse {
+  user: string
+  bot: string[]
+  
+}
+
 const Chatbot = () => {
-  const [messages, setMessages] = useState([]);
-  const [input, setInput] = useState('');
+  const [messages, setMessages] = useState<IAResponse[]>([]);
+  const [input, setInput] = useState<string>('');
 
   const sendMessage = async () => {
     const response = await fetch('/api/ai/suggestions', {
