@@ -1,33 +1,44 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, ChangeEvent, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import useUserStore from "@/store/useUserStore.js";
 import Cookies from "js-cookie";
 
-const JoinEvent = () => {
+interface EventData {
+  password: string;
+  id: string;
+  userId: string | number | null;
+}
+
+interface Message {
+  type: "success" | "error" | "";
+  text: string;
+}
+
+const JoinEvent: React.FC = () => {
   const router = useRouter();
   const { userId } = useUserStore();
-  const [loader, setLoader] = useState(false);
-  const [eventData, setEventData] = useState({
+  const [loader, setLoader] = useState<boolean>(false);
+  const [eventData, setEventData] = useState<EventData>({
     password: "",
     id: "",
-    userId,
+    userId: userId ?? "",
   });
-  const [message, setMessage] = useState({ type: "", text: "" });
+  const [message, setMessage] = useState<Message>({ type: "", text: "" });
 
   const handleClose = () => {
     router.push(`/events`);
   };
 
-  const handleChange = (e) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setEventData({
       ...eventData,
       [e.target.name]: e.target.value,
     });
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setLoader(true);
     const API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -38,57 +49,61 @@ const JoinEvent = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(eventData),
+        body: JSON.stringify({
+          ...eventData,
+          userId: eventData.userId?.toString() ?? "",
+        }),
       });
 
       if (response.ok) {
-        console.log('ESTE ES EL DE JOIN EVENT');
-
-        setMessage((prev) => ({
-          ...prev,
+        const joinResult = await response.json();
+        setMessage({
           type: "success",
           text: "Te has unido al evento con éxito.",
-        }));
-        // Obtener el valor de la cookie 'eventIds' y convertirla en un array de números
-        const joinResult = await response.json();
-          // Obtener la cookie de 'eventIds' y parsearla como un array de números
-          const eventIdsArray = Cookies.get("eventIds")
-            ? JSON.parse(Cookies.get("eventIds")).map(Number)
-            : []; // Si no existe, devolvemos un array vacío
+        });
 
-          // Agregar el nuevo eventId si no está ya en el array
-          const newEventId = joinResult.data.id; // Usa el ID del evento del resultado
-          if (!eventIdsArray.includes(newEventId)) {
-            const updatedEventIds = [...eventIdsArray, newEventId];
+        // Obtener y actualizar la cookie 'eventIds'
+        const eventIdsArray = Cookies.get("eventIds")
+          ? JSON.parse(Cookies.get("eventIds") as string).map(Number)
+          : [];
 
-            // Guardar el array actualizado en la cookie (usando JSON)
-            Cookies.set("eventIds", JSON.stringify(updatedEventIds), {
-              expires: 7,
-            }); // Expira en 7 días, puedes ajustarlo
-          }
+        const newEventId = joinResult.data.id;
+        if (!eventIdsArray.includes(newEventId)) {
+          const updatedEventIds = [...eventIdsArray, newEventId];
+          Cookies.set("eventIds", JSON.stringify(updatedEventIds), {
+            expires: 7,
+          });
+        }
 
         router.push(`/events/${joinResult.data.id}`);
       } else if (response.status === 409) {
-        // Manejar conflicto
-        console.log(joinResult); // Cambié joinResponse a result para que imprima el mensaje correcto
+        const joinResult = await response.json();
         setMessage({
           type: "error",
           text: joinResult.message || "Error: ya estás unido a este evento.",
         });
       } else {
-        setMessage({ type: "error", text: "Error al unirse al evento. Intenta nuevamente." });
+        setMessage({
+          type: "error",
+          text: "Error al unirse al evento. Intenta nuevamente.",
+        });
       }
     } catch (error) {
-      console.log(error)
-      setMessage({ type: "error", text: "Hubo un problema con el servidor. Intenta más tarde." });
+      console.error(error);
+      setMessage({
+        type: "error",
+        text: "Hubo un problema con el servidor. Intenta más tarde.",
+      });
     } finally {
-      setLoader(false); // Desactivar el loader
+      setLoader(false);
     }
   };
 
   return (
     <section className="bg-gray-100 p-8 rounded-lg shadow-lg w-full max-w-md mx-auto">
-      <h1 className="text-2xl font-extrabold text-center mb-6 text-violet-700">Unirse a Evento</h1>
+      <h1 className="text-2xl font-extrabold text-center mb-6 text-violet-700">
+        Unirse a Evento
+      </h1>
 
       {loader && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
@@ -101,7 +116,9 @@ const JoinEvent = () => {
       {message.text && (
         <div
           className={`mb-4 text-center p-2 rounded-lg ${
-            message.type === "success" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
+            message.type === "success"
+              ? "bg-green-100 text-green-700"
+              : "bg-red-100 text-red-700"
           }`}
         >
           {message.text}
@@ -110,8 +127,14 @@ const JoinEvent = () => {
 
       <form onSubmit={handleSubmit}>
         <div className="mb-6">
-          <label className="block text-gray-700 font-bold mb-2">Id del Evento</label>
+          <label
+            htmlFor="event-id"
+            className="block text-gray-700 font-bold mb-2"
+          >
+            Id del Evento
+          </label>
           <input
+            id="event-id"
             type="number"
             name="id"
             value={eventData.id}
@@ -122,8 +145,14 @@ const JoinEvent = () => {
         </div>
 
         <div className="mb-6">
-          <label className="block text-gray-700 font-bold mb-2">Contraseña del Evento</label>
+          <label
+            htmlFor="event-password"
+            className="block text-gray-700 font-bold mb-2"
+          >
+            Contraseña del Evento
+          </label>
           <input
+            id="event-password"
             type="password"
             name="password"
             value={eventData.password}
@@ -140,6 +169,7 @@ const JoinEvent = () => {
           Unirse al Evento
         </button>
         <button
+          type="button"
           onClick={handleClose}
           className="bg-violet-200 text-violet-600 px-4 py-2 mb-4 rounded-lg text-lg font-semibold hover:bg-red-500 hover:text-white cursor-pointer w-full mt-4 transition duration-200"
         >

@@ -1,23 +1,22 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 
-
-export function middleware(request) {
+export function middleware(request: NextRequest) {
     const eventsCookie = request.cookies.get('eventIds');
 
     console.log(eventsCookie);
-    const eventIdsArray = eventsCookie ? JSON.parse(eventsCookie.value).map(Number) : []; // Convertir la string separada por comas en un array de números
+    const eventIdsArray: number[] = eventsCookie ? JSON.parse(eventsCookie.value).map(Number) : [];
 
     console.log(eventIdsArray);
 
     const pathname = request.nextUrl.pathname;
     const eventIdMatch = pathname.match(/^\/events\/([^\/]+)/);
-    const eventIdFromUrl = eventIdMatch ? Number(eventIdMatch[1]) : null;
+    const eventIdFromUrl: number | null = eventIdMatch ? Number(eventIdMatch[1]) : null;
 
-    const isEventFromUser = eventIdsArray?.includes(eventIdFromUrl);
+    const isEventFromUser = eventIdFromUrl !== null && eventIdsArray.includes(eventIdFromUrl);
     const isHomePage = pathname.startsWith('/home');
     const isEventsPage = pathname === '/events';
 
-    const redirect = (url) => {
+    const redirect = (url: string): NextResponse | null => {
         const destinationURL = new URL(url, request.url);
 
         if (request.nextUrl.pathname !== destinationURL.pathname) {
@@ -27,7 +26,7 @@ export function middleware(request) {
         return null;
     };
 
-    if (!isEventFromUser && !isHomePage && !isEventsPage && eventIdFromUrl) {
+    if (!isEventFromUser && !isHomePage && !isEventsPage && eventIdFromUrl !== null) {
         return redirect('/events');
     }
 

@@ -1,20 +1,45 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useSwipeable } from "react-swipeable";
+import { useSwipeable, SwipeEventData } from "react-swipeable";
 import useUserStore from "@/store/useUserStore.js";
 import useCategoryIndexStore from "@/store/useCategoryIndexStore.js";
 import Image from "next/image";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-const SwipeableCard = ({ items, category, eventId }) => {
-  const { userId } = useUserStore();
-  const { setIndex, getIndex } = useCategoryIndexStore();
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [isProcessing, setIsProcessing] = useState(false); // Loader state
-  const [swipeDirection, setSwipeDirection] = useState(""); // Animation state
-  const [swipeOffset, setSwipeOffset] = useState(0);
+interface Item {
+  id: string;
+  name: string;
+  urlImage: string;
+}
+
+interface SwipeableCardProps {
+  items: Item[];
+  category: string;
+  eventId: string;
+}
+
+interface UserStore {
+  userId: string | null;
+}
+
+interface CategoryIndexStore {
+  setIndex: (eventId: string, category: string, index: number) => void;
+  getIndex: (eventId: string, category: string) => number;
+}
+
+const SwipeableCard: React.FC<SwipeableCardProps> = ({
+  items,
+  category,
+  eventId,
+}) => {
+  const { userId } = useUserStore() as UserStore;
+  const { setIndex, getIndex } = useCategoryIndexStore() as CategoryIndexStore;
+  const [currentIndex, setCurrentIndex] = useState<number>(0);
+  const [isProcessing, setIsProcessing] = useState<boolean>(false);
+  const [swipeDirection, setSwipeDirection] = useState<string>("");
+  const [swipeOffset, setSwipeOffset] = useState<number>(0);
 
   useEffect(() => {
     const savedIndex = getIndex(eventId, category);
@@ -97,21 +122,19 @@ const SwipeableCard = ({ items, category, eventId }) => {
   const handlers = useSwipeable({
     onSwipedLeft: handleDislike,
     onSwipedRight: handleLike,
-    onSwiping: (eventData) => {
+    onSwiping: (eventData: SwipeEventData) => {
       const offset = eventData.deltaX;
       setSwipeOffset(offset);
     },
     onSwiped: () => {
       setSwipeOffset(0);
     },
-    preventDefaultTouchmoveEvent: true,
     trackMouse: true,
-    trackTouch: true, // Ensure touch events are tracked
-    delta: 100, // Minimum distance in pixels before a swipe is recognized
-    rotationAngle: 0, // Don't rotate the swipe direction
+    trackTouch: true,
+    delta: 100,
+    rotationAngle: 0,
   });
 
-  // Loader styles (red for dislike, green for like)
   const loaderColor = swipeDirection === "left" ? "bg-red-500" : "bg-green-500";
 
   if (items.length === 0 || !items[currentIndex]) {
@@ -157,15 +180,14 @@ const SwipeableCard = ({ items, category, eventId }) => {
       <button
         onClick={handleDislike}
         className="hidden md:inline-block min-w-15 bg-white text-violet-600 px-6 py-3 rounded-full text-lg font-semibold hover:bg-gray-100 transition duration-300"
-        >
+      >
         <img
           src="/utils/corazon-roto.png"
           alt="Corazón roto"
-          className="w-8 h-8 m-auto transition-transform duration-300 transform hover:scale-110 hover:rotate-6" // Efectos de transformación
-          />
+          className="w-8 h-8 m-auto transition-transform duration-300 transform hover:scale-110 hover:rotate-6"
+        />
       </button>
 
-      {/* Imagen centrada en todas las pantallas */}
       <div {...handlers} className="relative overflow-hidden">
         <div
           className={`flex flex-col justify-evenly min-w-80 md:min-w-96 h-full min-h-80 items-center bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden cursor-pointer transform transition-transform duration-300 ease-out`}
@@ -215,15 +237,14 @@ const SwipeableCard = ({ items, category, eventId }) => {
       <button
         onClick={handleLike}
         className="hidden md:inline-block min-w-15 bg-white text-violet-600 px-6 py-3 rounded-full text-lg font-semibold hover:bg-gray-100 transition duration-300"
-        >
+      >
         <img
           src="/utils/corazon.png"
           alt="Corazón"
-          className="w-8 h-8 m-auto transition-transform duration-300 transform hover:scale-110 hover:rotate-6" // Efectos de transformación
-          />
+          className="w-8 h-8 m-auto transition-transform duration-300 transform hover:scale-110 hover:rotate-6"
+        />
       </button>
 
-      {/* Contenedor de botones */}
       <div className="flex justify-around w-screen md:w-auto md:hidden">
         <button
           onClick={handleDislike}
@@ -243,9 +264,7 @@ const SwipeableCard = ({ items, category, eventId }) => {
           <img
             src="/utils/corazon.png"
             alt="Corazón"
-            className="w-8 h-8 m-auto transition-transform duration-300 transform hover:scale-110 hover:rotate-6" // Efectos de transformación
-            width={150}
-            height={150}
+            className="w-8 h-8 m-auto transition-transform duration-300 transform hover:scale-110 hover:rotate-6"
           />
         </button>
       </div>

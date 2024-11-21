@@ -1,7 +1,6 @@
 import { create } from 'zustand';
 
-interface User {
-  // Define aquí las propiedades del usuario, por ejemplo:
+interface User { 
   id?: string;
   email?: string;
   name?: string;

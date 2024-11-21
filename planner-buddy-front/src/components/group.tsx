@@ -1,7 +1,12 @@
 import Image from "next/image";
 import styles from "../styles/Group.module.css";
 
-const Group = ({ name, imageUrl }) => {
+interface GroupProps {
+  name: string;
+  imageUrl: string;
+}
+
+const Group: React.FC<GroupProps> = ({ name, imageUrl }) => {
   return (
     <div className={styles.group}>
       <Image

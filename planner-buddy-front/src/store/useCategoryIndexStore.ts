@@ -1,30 +1,25 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 
-interface setIndex {
-  eventId: string;
-  category: string;
-  index: number;
+interface CategoryIndex {
+  [category: string]: number;
 }
 
-interface getIndex {
-  eventId: string;
-  category: string;
+interface Indexes {
+  [eventId: string]: CategoryIndex;
 }
 
-interface IState {
-  indexes: {
-    [eventId: string]: {
-      [category: string]: number;
-    };
-  };
+interface CategoryIndexState {
+  indexes: Indexes;
+  setIndex: (eventId: string, category: string, index: number) => void;
+  getIndex: (eventId: string, category: string) => number;
 }
 
 const useCategoryIndexStore = create(
-  persist(
+  persist<CategoryIndexState>(
     (set, get) => ({
       indexes: {},
-      setIndex: ({eventId, category, index}: setIndex) => set((state: IState) => ({
+      setIndex: (eventId, category, index) => set((state) => ({
         indexes: {
           ...state.indexes,
           [eventId]: {
@@ -33,9 +28,9 @@ const useCategoryIndexStore = create(
           }
         }
       })),
-      getIndex: ({eventId, category}: getIndex) => {
-        const state: any = get();
-        return state.indexes[eventId]?.[category] || 0;
+      getIndex: (eventId, category) => {
+        const state = get();
+        return state.indexes[eventId]?.[category] ?? 0;
       },
     }),
     {

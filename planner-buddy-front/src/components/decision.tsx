@@ -1,27 +1,53 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-const DecisionManager = ({ eventId, creator }) => {
-  const router = useRouter();
-  const [decision, setDecision] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [noDecision, setNoDecision] = useState(false); 
-  const [hasResults, setHasResults] = useState({ movies: false, places: false, meals: false });
+interface Decision {
+  movie: {
+    urlImage: string;
+    title: string;
+  };
+  meal: {
+    urlImage: string;
+    title: string;
+  };
+  place: {
+    urlImage: string;
+    title: string;
+  };
+}
 
-  const getDecision = async () => {
+interface HasResults {
+  movies: boolean;
+  places: boolean;
+  meals: boolean;
+}
+
+interface DecisionManagerProps {
+  eventId: string;
+  creator: boolean;
+}
+
+const DecisionManager: React.FC<DecisionManagerProps> = ({ eventId, creator }) => {
+  const router = useRouter();
+  const [decision, setDecision] = useState<Decision | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+  const [noDecision, setNoDecision] = useState<boolean>(false);
+  const [hasResults, setHasResults] = useState<HasResults>({ movies: false, places: false, meals: false });
+
+  const getDecision = useCallback(async (): Promise<void> => {
     setLoading(true);
     setError(null);
-    setNoDecision(false); // Resetear el estado de noDecision
+    setNoDecision(false);
     try {
       const response = await fetch(`${API_URL}/events/${eventId}/decision`);
       const data = await response.json();
       if (!response.ok) {
         if (response.status === 404) {
-          setNoDecision(true); 
+          setNoDecision(true);
           setHasResults(data.hasResults || { movies: false, places: false, meals: false });
         } else {
           throw new Error("Failed to fetch decision");
@@ -36,9 +62,9 @@ const DecisionManager = ({ eventId, creator }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [eventId]);
 
-  const createDecision = async () => {
+  const createDecision = async (): Promise<void> => {
     setLoading(true);
     setError(null);
     try {
@@ -53,7 +79,7 @@ const DecisionManager = ({ eventId, creator }) => {
         throw new Error("Failed to create decision");
       }
 
-      await getDecision(); // Fetch the updated decision after creating it
+      await getDecision();
     } catch (err) {
       console.error("Error creating decision:", err);
       setError("Failed to create decision. Please try again.");
@@ -64,9 +90,9 @@ const DecisionManager = ({ eventId, creator }) => {
 
   useEffect(() => {
     getDecision();
-  }, [eventId]);
+  }, [getDecision]);
 
-  const handleIA = () => {
+  const handleIA = (): void => {
     router.push(`/events/${eventId}/result/ia`);
   };
 
@@ -82,10 +108,6 @@ const DecisionManager = ({ eventId, creator }) => {
     );
   }
 
-  //   if (noDecision) {
-  //     return <div>No hay decisiones tomadas aún. Por favor, crea una decisión.</div>;
-  //   }
-
   if (error) {
     return <div>Error: {error}</div>;
   }
@@ -99,35 +121,33 @@ const DecisionManager = ({ eventId, creator }) => {
           ¡Todavía no tomaron una decisión!
         </h2>
         <p className="text-gray-600 text-center mb-6">
-        {canCreateDecision 
+          {canCreateDecision
             ? "Dirígete a resultados si te sientes con ganas de decidir!"
             : "Aún no hay suficientes resultados para tomar una decisión."}
         </p>
         {creator && (
-            <button
-              id="decision-btn"
-              onClick={createDecision}
-              className={`px-6 py-3 rounded-full text-lg font-semibold transition-all duration-300 ${
-                canCreateDecision
-                  ? "bg-purple-900 text-white hover:bg-purple-600"
-                  : "bg-gray-300 text-gray-500 cursor-not-allowed"
-              }`}
-              disabled={!canCreateDecision || loading}
-            >
-              Fijar Decisión
-            </button>
-
-          )}
+          <button
+            id="decision-btn"
+            onClick={createDecision}
+            className={`px-6 py-3 rounded-full text-lg font-semibold transition-all duration-300 ${
+              canCreateDecision
+                ? "bg-purple-900 text-white hover:bg-purple-600"
+                : "bg-gray-300 text-gray-500 cursor-not-allowed"
+            }`}
+            disabled={!canCreateDecision || loading}
+          >
+            Fijar Decisión
+          </button>
+        )}
       </div>
     );
   }
 
-  const categoryTitles = {
+  const categoryTitles: { [key: string]: string } = {
     movie: "Película",
     meal: "Comida",
     place: "Lugar",
   };
-  console.log("isCreator", creator);
 
   return (
     <div className="bg-white rounded-lg py-5 px-2">
@@ -138,37 +158,36 @@ const DecisionManager = ({ eventId, creator }) => {
       </div>
       {decision ? (
         <div className="flex flex-col items-center justify-center">
-        <div className="flex flex-col md:flex-row justify-evenly gap-8">
-          {["movie", "meal", "place"].map((category) => (
-            <div
-              key={category}
-              className="border rounded-lg p-6 shadow-lg flex flex-col items-center justify-between transition-transform transform min-h-60"
-            >
-              <h3 className="text-2xl font-semibold mb-6 capitalize text-violet-900">
-                {categoryTitles[category]}
-              </h3>
-              <div className="flex-grow flex items-center justify-center mb-6">
-                <Image
-                  src={decision[category].urlImage}
-                  alt={decision[category].title}
-                  width={200}
-                  height={200}
-                  className="rounded-lg shadow-lg"
-                />
+          <div className="flex flex-col md:flex-row justify-evenly gap-8">
+            {["movie", "meal", "place"].map((category) => (
+              <div
+                key={category}
+                className="border rounded-lg p-6 shadow-lg flex flex-col items-center justify-between transition-transform transform min-h-60"
+              >
+                <h3 className="text-2xl font-semibold mb-6 capitalize text-violet-900">
+                  {categoryTitles[category]}
+                </h3>
+                <div className="flex-grow flex items-center justify-center mb-6">
+                  <Image
+                    src={decision[category as keyof Decision].urlImage}
+                    alt={decision[category as keyof Decision].title}
+                    width={200}
+                    height={200}
+                    className="rounded-lg shadow-lg"
+                  />
+                </div>
+                <p className="text-lg text-gray-700 text-center">
+                  {decision[category as keyof Decision].title}
+                </p>
               </div>
-              <p className="text-lg text-gray-700 text-center">
-                {decision[category].title}
-              </p>
-            </div>
-          ))}
+            ))}
           </div>
-            <button
-          onClick={handleIA}
-          className="bg-violet-600 hover:bg-violet-500 text-white px-6 py-3 mt-5 rounded-full md:text-lg font-semibold"
-        >
-          Generá tu recomendación con IA 🌟
-        </button>
-
+          <button
+            onClick={handleIA}
+            className="bg-violet-600 hover:bg-violet-500 text-white px-6 py-3 mt-5 rounded-full md:text-lg font-semibold"
+          >
+            Generá tu recomendación con IA 🌟
+          </button>
         </div>
       ) : (
         <div className="text-center">
