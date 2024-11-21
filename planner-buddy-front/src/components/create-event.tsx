@@ -1,11 +1,13 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, ChangeEvent, FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import useUserStore from "@/store/useUserStore.js";
-import useEventStore from "@/store/useEventStore.js";
+import useUserStore from "@/store/useUserStore";
+import useEventStore from "@/store/useEventStore";
 import Cookies from "js-cookie";
 
-const CreateEvent = ({ refreshEvents }) => {
+
+
+const CreateEvent = () => {
   const { userId } = useUserStore();
   const router = useRouter();
   const setEventId = useEventStore((state) => state.setEventId);
@@ -25,7 +27,7 @@ const CreateEvent = ({ refreshEvents }) => {
     }));
   }, [userId]);
 
-  const handleChange = (e) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setEventData({
       ...eventData,
       [e.target.name]: e.target.value,
@@ -36,7 +38,7 @@ const CreateEvent = ({ refreshEvents }) => {
     router.push(`/events`);
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const API_URL = process.env.NEXT_PUBLIC_API_URL;
     setLoader(true);
@@ -94,8 +96,7 @@ const CreateEvent = ({ refreshEvents }) => {
             type: "success",
             text: "Te has unido al evento con éxito.",
           }));
-          router.push(`/events/${newEventId}`);
-          refreshEvents()          // Redirigir al evento
+          router.push(`/events/${newEventId}`);    // Redirigir al evento
         } else if (joinResponse.status === 409) {
           // Manejar conflicto
           setMessage({

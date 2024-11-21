@@ -1,6 +1,11 @@
 import { create } from 'zustand';
 
-const useEventStore = create((set) => ({
+interface IEvent {
+  eventId: number | null;
+  setEventId: (id: string) => void;
+}
+
+const useEventStore = create<IEvent>((set) => ({
   eventId: typeof window !== 'undefined' ? Number(localStorage.getItem('eventId')) : null,
   setEventId: (id) => {
     localStorage.setItem('eventId', id);

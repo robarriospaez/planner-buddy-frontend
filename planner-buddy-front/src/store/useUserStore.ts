@@ -1,6 +1,11 @@
 import { create } from 'zustand';
 
-const useUserStore = create((set) => ({
+interface IUser {
+  userId: number | null;
+  setUserId: (id: string) => void;
+}
+
+const useUserStore = create<IUser>((set) => ({
   userId: typeof window !== 'undefined' ? Number(localStorage.getItem('userId')) : null,
   setUserId: (id) => {
     localStorage.setItem('userId', id); 
