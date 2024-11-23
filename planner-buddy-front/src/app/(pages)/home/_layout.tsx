@@ -1,7 +1,12 @@
-import React from "react";
+import React, { ReactNode } from "react";
 import Link from "next/link";
 
-export default function HomeLayout({ children }) {
+// Definimos la interfaz para las props del componente HomeLayout
+interface HomeLayoutProps {
+  children: ReactNode;
+}
+
+const HomeLayout: React.FC<HomeLayoutProps> = ({ children }) => {
   return (
     <div className="min-h-screen flex flex-col bg-gray-100">
       {/* Navigation */}
@@ -35,4 +40,6 @@ export default function HomeLayout({ children }) {
       </footer>
     </div>
   );
-}
+};
+
+export default HomeLayout;

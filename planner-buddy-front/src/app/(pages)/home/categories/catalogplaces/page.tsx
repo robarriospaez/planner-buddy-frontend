@@ -1,19 +1,24 @@
-'use client'
+'use client';
+
 import React, { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import withAuth from "@/components/withAuth.js";
-import Image from "next/image";
+import withAuth from "@/components/withAuth";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import ItemCard from "@/components/item-card";
 
+// Definir el tipo de la respuesta de la API
+interface Place {
+  id: number;
+  title: string;
+  urlImage: string;
+  description: string; // Descripción que posiblemente venga de la API
+}
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-
-
-const PlacesCatalogPage = () => {
-  const [places, setPlaces] = useState([]);
-
+const PlacesCatalogPage: React.FC = () => {
+  // Definir el tipo de estado `places` como un array de `Place`
+  const [places, setPlaces] = useState<Place[]>([]);
 
   useEffect(() => {
     const url = `${API_URL}/places`;
@@ -21,37 +26,34 @@ const PlacesCatalogPage = () => {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-      }
+      },
     };
-
-
 
     const fetchPlaces = async () => {
       try {
         const response = await fetch(url, options);
-        const result = await response.json();
+        const result: Place[] = await response.json(); // Especificamos que el resultado es un array de `Place`
 
-
+        // Ajustar el formato para coincidir con la interfaz Place
         const formattedPlaces = result.map((place) => ({
           id: place.id,
-          name: place.title,
+          title: place.title,
           urlImage: place.urlImage,
+          description: place.description,
         }));
 
         console.log(formattedPlaces);
         setPlaces(formattedPlaces);
       } catch (error) {
-        console.error("Error al obtener las películas:", error);
+        console.error("Error al obtener los lugares:", error);
       }
     };
 
     fetchPlaces();
   }, []);
 
-
   return (
     <div>
-      
       <Navbar />
 
       {/* Features Section */}
@@ -64,14 +66,12 @@ const PlacesCatalogPage = () => {
             {places.map((place) => (
               <ItemCard
                 key={place.id}
-                category={place.name}
+                category={place.title} // usamos 'title' porque es lo que nos da la API
                 description={place.description}
                 imageUrl={place.urlImage}
               />
             ))}
           </div>
-
-          
         </div>
       </section>
 
