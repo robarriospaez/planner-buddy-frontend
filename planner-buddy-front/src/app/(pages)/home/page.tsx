@@ -3,7 +3,7 @@
 import React from "react";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
-import ItemCard from "@/components/item-card"; // Se usará el componente importado
+import ItemCard from "@/components/item-card"; // Componente que se usará para mostrar las tarjetas
 import withAuth from "@/components/withAuth";
 
 // Componente principal de la página de inicio
@@ -49,21 +49,21 @@ const HomePage: React.FC = () => {
             <a href="/home/categories/catalogmovies">
               <ItemCard
                 category="Peliculas"
-                description="¿Que quisieras ver?"
+                description="¿Qué quisieras ver?"
                 imageUrl="https://cdn-icons-png.flaticon.com/512/7295/7295380.png"
               />
             </a>
             <a href="/home/categories/catalogmeals">
               <ItemCard
                 category="Comidas"
-                description="Mmmmm... ¿Que quiero comer hoy?"
+                description="Mmmmm... ¿Qué quiero comer hoy?"
                 imageUrl="https://cdn-icons-png.flaticon.com/512/4359/4359642.png"
               />
             </a>
             <a href="/home/categories/catalogplaces">
               <ItemCard
                 category="Lugares"
-                description="¿Donde vamos?"
+                description="¿Dónde vamos?"
                 imageUrl="https://cdn-icons-png.flaticon.com/512/11074/11074673.png"
               />
             </a>
