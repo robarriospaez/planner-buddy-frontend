@@ -1,9 +1,13 @@
-export default function LoginLayout({ children }) {
+import React from 'react';
+
+interface LoginLayoutProps {
+  children: React.ReactNode;
+}
+
+export default function LoginLayout({ children }: LoginLayoutProps) {
   return (
-    //<div className="h-screen flex items-center justify-center py-20 bg-gradient-to-b from-violet-500 to-violet-200">
-      <main className="w-full h-full min-h-screen flex items-center justify-center p-8 shadow-md bg-gradient-to-b from-violet-500 to-violet-200">
-        {children}
-      </main>
-    //</div>
+    <main className="w-full h-full min-h-screen flex items-center justify-center p-8 shadow-md bg-gradient-to-b from-violet-500 to-violet-200">
+      {children}
+    </main>
   );
 }

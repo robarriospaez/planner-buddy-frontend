@@ -1,28 +1,37 @@
-"use client"; // Indica que este es un componente del cliente
+"use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation"; // Actualiza la importación de router
+import React, { useState, FormEvent, ChangeEvent } from "react";
+import { useRouter } from "next/navigation";
 
-const RegisterPage = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [username, setUsername] = useState("");
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [birthDate, setBirthDate] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState(null); // Estado para los errores
-  const router = useRouter(); // Usa el hook del cliente para la navegación
-  const API_URL = process.env.NEXT_PUBLIC_API_URL;
+interface UserData {
+  username: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  birthDate: Date;
+  password: string;
+}
 
-  const handleSubmit = async (e) => {
+const RegisterPage: React.FC = () => {
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [username, setUsername] = useState<string>("");
+  const [firstName, setFirstName] = useState<string>("");
+  const [lastName, setLastName] = useState<string>("");
+  const [birthDate, setBirthDate] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const router = useRouter();
+  const API_URL = process.env.NEXT_PUBLIC_API_URL as string;
+
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
-    setErrorMessage(null); // Limpiamos el error al intentar enviar de nuevo
+    setErrorMessage(null);
 
     const birthDateObject = new Date(birthDate);
 
-    const userData = {
+    const userData: UserData = {
       username,
       firstName,
       lastName,
@@ -50,10 +59,14 @@ const RegisterPage = () => {
       router.push("/login");
     } catch (error) {
       console.error("Ocurrió un error:", error);
-      setErrorMessage(error.message || "Error inesperado. Inténtalo de nuevo.");
+      setErrorMessage((error as Error).message || "Error inesperado. Inténtalo de nuevo.");
     } finally {
-      setLoading(false); // Dejamos de cargar
+      setLoading(false);
     }
+  };
+
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>, setter: React.Dispatch<React.SetStateAction<string>>) => {
+    setter(e.target.value);
   };
 
   return (
@@ -95,7 +108,7 @@ const RegisterPage = () => {
                   type="text"
                   id="firstName"
                   value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
+                  onChange={(e) => handleInputChange(e, setFirstName)}
                   className="mt-1 block w-full p-3 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-xl"
                   required
                 />
@@ -112,7 +125,7 @@ const RegisterPage = () => {
                   type="text"
                   id="lastName"
                   value={lastName}
-                  onChange={(e) => setLastName(e.target.value)}
+                  onChange={(e) => handleInputChange(e, setLastName)}
                   className="mt-1 block w-full p-3 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-xl"
                   required
                 />
@@ -129,7 +142,7 @@ const RegisterPage = () => {
                   type="text"
                   id="username"
                   value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+                  onChange={(e) => handleInputChange(e, setUsername)}
                   className="mt-1 block w-full p-3 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-xl"
                   required
                 />
@@ -146,7 +159,7 @@ const RegisterPage = () => {
                   type="date"
                   name="birthDate"
                   value={birthDate}
-                  onChange={(e) => setBirthDate(e.target.value)}
+                  onChange={(e) => handleInputChange(e, setBirthDate)}
                   className="mt-1 block w-full p-3 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-xl"
                   required
                 />
@@ -163,7 +176,7 @@ const RegisterPage = () => {
                   type="email"
                   id="email"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => handleInputChange(e, setEmail)}
                   className="mt-1 block w-full p-3 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-xl"
                   required
                 />
@@ -180,7 +193,7 @@ const RegisterPage = () => {
                   type="password"
                   id="password"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => handleInputChange(e, setPassword)}
                   className="mt-1 block w-full p-3 border-gray-400 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-xl"
                   required
                 />
@@ -193,7 +206,7 @@ const RegisterPage = () => {
               <button
                 type="submit"
                 className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md shadow-sm hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                disabled={loading} // Deshabilitar el botón si está cargando
+                disabled={loading}
               >
                 Registrarse
               </button>
