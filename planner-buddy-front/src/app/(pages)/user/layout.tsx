@@ -1,10 +1,20 @@
 "use client";
+
+import React from 'react';
 import Footer from "@/components/footer";
 import Navbar from "@/components/navbar";
-// import Link from "next/link"
-import { usePathname } from "next/navigation";
+// import { usePathname } from "next/navigation";
 
-const LINKS = [
+interface Link {
+  name: string;
+  path: string;
+}
+
+interface LayoutProps {
+  children: React.ReactNode;
+}
+
+const LINKS: Link[] = [
   {
     name: "Configuracion",
     path: "/events/eventId:1",
@@ -19,8 +29,9 @@ const LINKS = [
   },
 ];
 
-export default function EventsLayout({ children }) {
-  const pathname = usePathname();
+const EventsLayout: React.FC<LayoutProps> = ({ children }) => {
+  // const pathname = usePathname();
+
   return (
     <>
       <Navbar />
@@ -42,4 +53,6 @@ export default function EventsLayout({ children }) {
       <Footer />
     </>
   );
-}
+};
+
+export default EventsLayout;

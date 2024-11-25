@@ -1,17 +1,35 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import Footer from "@/components/footer";
 import Navbar from "@/components/navbar";
-import withAuth from "@/components/withAuth.js";
+import withAuth from "@/components/withAuth";
 import { useRouter } from "next/navigation";
 import "@/styles/custom-scrollbar.css";
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-function EventsLayout({ children }) {
-  const [userEvents, setUserEvents] = useState([]);
-  const [cookiesEvent, setCookiesEvent] = useState([]);
-  const [loader, setLoader] = useState(true);
+interface Event {
+  id: string;
+  name: string;
+}
+
+interface ApiEventData {
+  event: {
+    id: string;
+    name: string;
+  };
+}
+
+interface EventsLayoutProps {
+  children: React.ReactNode;
+}
+
+function EventsLayout({ children }: EventsLayoutProps) {
+  const [userEvents, setUserEvents] = useState<Event[]>([]);
+  const [cookiesEvent, setCookiesEvent] = useState<string[]>([]);
+  const [loader, setLoader] = useState<boolean>(true);
   const router = useRouter();
 
   useEffect(() => {
@@ -31,7 +49,7 @@ function EventsLayout({ children }) {
         console.log('User events:', result);
 
         if (Array.isArray(result.data)) {
-          const events = result.data.map(item => ({
+          const events: Event[] = result.data.map((item: ApiEventData) => ({
             id: item.event.id,
             name: item.event.name
           }));
@@ -74,7 +92,7 @@ function EventsLayout({ children }) {
     return () => clearInterval(intervalId);
   }, []);
 
-  const handleEventClick = (eventId) => {
+  const handleEventClick = (eventId: string) => {
     console.log('Navigating to event with ID:', eventId);
     if (eventId) {
       router.push(`/events/${eventId}`);
@@ -118,8 +136,6 @@ function EventsLayout({ children }) {
       {!loader && (userEvents.length > 0 || cookiesEvent.length > 0) && (
         <div className="flex flex-col bg-gradient-to-b from-violet-200 to-violet-200 mx-auto p-4 gap-4 h-full min-h-screen lg:flex-row">
           <aside className="bg-violet-500 lg:max-w-64 px-5 grid rounded-lg relative order-1 lg:order-0 h-full">
-          {/* <aside className="custom-scrollbar bg-violet-600 lg:max-w-72 px-5 grid rounded-lg relative order-1 lg:order-0 h-screen overflow-y-auto"> */}
-
             <nav>
               <ul className="flex flex-col py-5 my-5 gap-10 sticky top-12">
                 <span className="top-4 left-4">

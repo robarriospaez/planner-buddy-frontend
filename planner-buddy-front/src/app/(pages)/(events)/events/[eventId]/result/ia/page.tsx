@@ -1,21 +1,34 @@
 "use client";
-import React, { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import withAuth from "@/components/withAuth.js";
+
+import React, { useState, useEffect, useCallback } from "react";
+import withAuth from "@/components/withAuth";
 import "@/styles/ai-loader.css";
 
+interface Params {
+  eventId: string;
+}
 
-function AIRecommendationsPage({ params }) {
+interface AIRecommendationsPageProps {
+  params: Params;
+}
+
+interface Recommendation {
+  [category: string]: string[];
+}
+
+interface ApiResponse {
+  [category: string]: string[];
+}
+
+function AIRecommendationsPage({ params }: AIRecommendationsPageProps) {
   const { eventId } = params;
-  const router = useRouter();
-  const [recommendations, setRecommendations] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [recommendations, setRecommendations] = useState<Recommendation | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-  // Función para obtener los elementos más likeados
-  const getMostLikedItems = async (eventId, category) => {
+  const getMostLikedItems = useCallback(async (eventId: string, category: string): Promise<ApiResponse> => {
     try {
       const response = await fetch(`${API_URL}/events/${eventId}/${category}/mostLiked`, {
         method: 'GET',
@@ -28,10 +41,9 @@ function AIRecommendationsPage({ params }) {
       console.error('Error en getMostLikedItems:', error);
       throw error;
     }
-  };
+  }, [API_URL]);
 
-  // Función para obtener los elementos dislikeados
-  const getDislikedItems = async (eventId, category) => {
+  const getDislikedItems = useCallback(async (eventId: string, category: string): Promise<ApiResponse> => {
     try {
       const response = await fetch(`${API_URL}/events/${eventId}/${category}/disliked`, {
         method: 'GET',
@@ -44,7 +56,7 @@ function AIRecommendationsPage({ params }) {
       console.error('Error en getDislikedItems:', error);
       throw error;
     }
-  };
+  }, [API_URL]);
 
   useEffect(() => {
     const getRecommendations = async () => {
@@ -63,16 +75,16 @@ function AIRecommendationsPage({ params }) {
             places,
             foods,
             dislikes
-          }), // Enviar datos al backend
+          }),
         });
 
         if (!response.ok) throw new Error("Failed to get recommendations");
-        const data = await response.json();
+        const data: Recommendation = await response.json();
         console.log(data);
         setRecommendations(data);
       } catch (error) {
         console.error("Error getting recommendations:", error);
-        setError(error.message);
+        setError(error instanceof Error ? error.message : String(error));
       } finally {
         setLoading(false);
       }
@@ -81,18 +93,21 @@ function AIRecommendationsPage({ params }) {
     if (eventId) {
       getRecommendations();
     }
-  }, [eventId]);
+  }, [eventId, getMostLikedItems, getDislikedItems]);
 
-  if (loading) return  <div className="shimmer-text text-center text-violet-900 flex flex-row items-center justify-center">Cargando recomendaciones...
-  <div id="preloader6">
-    <div>
-    <span className="shimmer-text sparkle"></span>
-    <span className="shimmer-text sparkle"></span>
-    <span className="shimmer-text sparkle"></span>
-    <span className="shimmer-text sparkle"></span>
+  if (loading) return (
+    <div className="shimmer-text text-center text-violet-900 flex flex-row items-center justify-center">
+      Cargando recomendaciones...
+      <div id="preloader6">
+        <div>
+          <span className="shimmer-text sparkle"></span>
+          <span className="shimmer-text sparkle"></span>
+          <span className="shimmer-text sparkle"></span>
+          <span className="shimmer-text sparkle"></span>
+        </div>
+      </div>
     </div>
-  </div>
-  </div>
+  );
 
   if (error) return <div>Error: {error}</div>;
 
