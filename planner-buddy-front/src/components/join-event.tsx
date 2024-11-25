@@ -2,7 +2,7 @@
 
 import React, { useState, ChangeEvent, FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import useUserStore from "@/store/useUserStore.js";
+import useUserStore from "@/store/useUserStore";
 import Cookies from "js-cookie";
 
 interface EventData {

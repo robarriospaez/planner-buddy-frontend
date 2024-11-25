@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import { useSwipeable, SwipeEventData } from "react-swipeable";
-import useUserStore from "@/store/useUserStore.js";
-import useCategoryIndexStore from "@/store/useCategoryIndexStore.js";
+import useUserStore from "@/store/useUserStore";
+import useCategoryIndexStore from "@/store/useCategoryIndexStore";
 import Image from "next/image";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;

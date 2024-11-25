@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import useAuthStore from '../store/useAuthStore.js';
+import useAuthStore from '@/store/useAuthStore';
 import { ComponentType, FC } from 'react';
 
 // Definimos un tipo para las props que esperamos recibir
