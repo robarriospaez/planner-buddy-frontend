@@ -1,7 +1,12 @@
+import React from "react";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 
-export default function CategoryLayout({ children }) {
+interface CategoryLayoutProps {
+  children: React.ReactNode;
+}
+
+export default function CategoryLayout({ children }: CategoryLayoutProps) {
   return (
     <>
       <Navbar />
