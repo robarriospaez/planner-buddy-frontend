@@ -1,10 +1,8 @@
 "use client";
-import React, {useEffect} from "react";
+import React from "react";
 import { useRouter } from "next/navigation";
 import withAuth from "@/components/withAuth.js";
 import Image from "next/image";
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
-
 
 const Events = () => {
   const router = useRouter();
@@ -17,7 +15,6 @@ const Events = () => {
     router.push(`/events/joinEvent`);
   };
 
-  
   return (
     <section className=" bg-violet-400 place-items-center rounded-lg h-full min-h-screen">
       <div className="mt-20 lg:mt-0 flex flex-col items-center justify-center gap-8 md:flex-row h-full">
@@ -55,7 +52,6 @@ const Events = () => {
       </div>
     </section>
   );
-  s;
 };
 
 export default withAuth(Events);

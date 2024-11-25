@@ -1,29 +1,37 @@
 'use client';
 
 import { useRouter } from "next/navigation";
-import withAuth from "@/components/withAuth.js";
-import LikedItemsChart from "@/components/result.js";
-import DecisionManager from "@/components/decision.js";
+import withAuth from "@/components/withAuth";
+import LikedItemsChart from "@/components/result";
+import DecisionManager from "@/components/decision";
 import { useState, useEffect } from "react";
-import useUserStore from "@/store/useUserStore.js";
+import useUserStore from "@/store/useUserStore";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
+interface DecisionPageProps {
+  params: {
+    eventId: string;
+  };
+}
 
-const DecisionPage = ({ params }) => {
+interface EventData {
+  data: {
+    userId: number;
+  };
+}
+
+const DecisionPage: React.FC<DecisionPageProps> = ({ params }) => {
   const router = useRouter();
   const { eventId } = params;
   const { userId } = useUserStore();
-  const [isCreator, setIsCreator] = useState();
+  const [isCreator, setIsCreator] = useState<boolean>(false);
   
   const goToEvent = () => {
     router.push(`/events/${eventId}`);
   };
 
-
-//* */
-
-useEffect(() => {
+  useEffect(() => {
     const getEventInfo = async () => {
       try {
         const response = await fetch(`${API_URL}/events/${eventId}`, {
@@ -37,30 +45,28 @@ useEffect(() => {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
   
-        const data = await response.json();
+        const data: EventData = await response.json();
         console.log(`Event ${eventId} retrieved successfully:`, data);
         
         setIsCreator(userId === data.data.userId);
-        console.log('isCreator', isCreator);
       } catch (error) {
         console.error(`Error getting event: ${eventId}`, error);
-        console.error("Error details:", error.message);
+        if (error instanceof Error) {
+          console.error("Error details:", error.message);
+        }
       }
     };
 
     getEventInfo();
-  }, []);
-
-//* */
-
+  }, [eventId, userId]);
 
   return (
     <section className="p-3">
       <DecisionManager eventId={eventId} creator={isCreator} />
       <section className="h-full min-h-screen bg-violet-400 rounded-lg w-full relative justify-evenly flex flex-col md:flex-row gap-8 my-8">
-        <LikedItemsChart eventId={eventId} category={'movies'}  />
-        <LikedItemsChart eventId={eventId} category={'meals'} />
-        <LikedItemsChart eventId={eventId} category={'places'} />
+        <LikedItemsChart eventId={eventId} category='movies' />
+        <LikedItemsChart eventId={eventId} category='meals' />
+        <LikedItemsChart eventId={eventId} category='places' />
       </section>
       <div className="flex flex-col items-center justify-center gap-8 py-8 lg:flex-row">
         <button

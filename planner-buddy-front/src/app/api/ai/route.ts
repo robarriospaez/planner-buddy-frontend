@@ -1,14 +1,31 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { CohereClient } from 'cohere-ai';
 
 const cohere = new CohereClient({
-  token: process.env.COHERE_API_KEY,
+  token: process.env.COHERE_API_KEY as string,
 });
 
-// Función para manejar el método POST
-export async function POST(request) {
+interface Item {
+  title: string;
+}
+
+interface RequestBody {
+  eventId: string;
+  movies: Item[];
+  places: Item[];
+  foods: Item[];
+  dislikes: Item[];
+}
+
+interface AIResponse {
+  food: string[];
+  place: string[];
+  movie: string[];
+}
+
+export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
-    const { eventId, movies, places, foods, dislikes } = await request.json();
+    const { eventId, movies, places, foods, dislikes }: RequestBody = await request.json();
 
     if (!eventId) {
       return NextResponse.json({ error: 'EventId is required' }, { status: 400 });
@@ -19,7 +36,7 @@ export async function POST(request) {
       message: `likes: ${movies.map(movie => movie.title).join(', ')}, places: ${places.map(place => place.title).join(', ')}, foods: ${foods.map(food => food.title).join(', ')}, dislikes: ${dislikes.map(dislike => dislike.title).join(', ')}`,
     });
 
-    const resultJSON: string = JSON.parse(response.text);
+    const resultJSON: AIResponse = JSON.parse(response.text);
     return NextResponse.json(resultJSON);
   } catch (error) {
     console.error(error);

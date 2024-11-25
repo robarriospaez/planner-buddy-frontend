@@ -3,22 +3,28 @@
 import React from "react";
 import { useRouter } from "next/navigation";
 import ItemCard from "@/components/item-card";
-import withAuth from '@/components/withAuth.js'
+import withAuth from '@/components/withAuth';
 
-const Categories = ({ params }) => {
+interface CategoriesProps {
+  params: {
+    eventId: string;
+  };
+}
+
+const Categories: React.FC<CategoriesProps> = ({ params }) => {
   const router = useRouter();
   const { eventId } = params;
 
   const goToEvent = () => {
     router.push(`/events/${eventId}`);
   };
+
   const ready = () => {
     router.push(`/events/${eventId}/result`);
   };
 
-
   return (
-    <section className="h-full bg-violet-400 grid place-items-center flex-1 pb-8"  >
+    <section className="h-full bg-violet-400 grid place-items-center flex-1 pb-8">
       <h1 className="text-3xl mt-10 font-bold text-center mb-12 text-white hover:text-[#130606df] hover:scale-105 transition-transform duration-300">
         Categorías del Evento {eventId}
       </h1> 
@@ -53,16 +59,16 @@ const Categories = ({ params }) => {
         </div>
       </section>
       <div className="flex flex-row items-center justify-center gap-8">
-      <button onClick={goToEvent}>
-        <a className="bg-white text-violet-600 px-6 py-3 rounded-full text-lg my-10 font-semibold hover:bg-gray-100">
-          Ir Atrás
-        </a>
-      </button>
-      <button onClick={ready}>
-        <a className="bg-white text-violet-600 px-6 py-3 rounded-full text-lg my-10 font-semibold hover:bg-gray-100">
-          Ir a Resultado
-        </a>
-      </button>
+        <button onClick={goToEvent}>
+          <a className="bg-white text-violet-600 px-6 py-3 rounded-full text-lg my-10 font-semibold hover:bg-gray-100">
+            Ir Atrás
+          </a>
+        </button>
+        <button onClick={ready}>
+          <a className="bg-white text-violet-600 px-6 py-3 rounded-full text-lg my-10 font-semibold hover:bg-gray-100">
+            Ir a Resultado
+          </a>
+        </button>
       </div>
     </section>
   );

@@ -1,28 +1,66 @@
 "use client";
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation"; // Actualiza la importación de router
-import useAuthStore from "@/store/useAuthStore.js";
-import useUserStore from "@/store/useUserStore.js";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import useAuthStore from "@/store/useAuthStore";
+import useUserStore from "@/store/useUserStore";
 
-const LoginPage = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
+interface LoginData {
+  email: string;
+  password: string;
+}
+
+interface ApiResponse {
+  data: {
+    id: string;
+    token: string;
+  };
+}
+
+interface Event {
+  eventId: string;
+  // Añade aquí otras propiedades del evento si las hay
+}
+
+interface EventsApiResponse {
+  data: Event[];
+}
+
+const LoginPage: React.FC = () => {
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [errorMessage, setErrorMessage] = useState<string>("");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
   const login = useAuthStore((state) => state.login);
   const setUserId = useUserStore((state) => state.setUserId);
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
-  const API_URL = process.env.NEXT_PUBLIC_API_URL;
+  const API_URL = process.env.NEXT_PUBLIC_API_URL as string;
 
-  const handleSubmit = async (e) => {
+  const fetchUserEvents = async (userId: string) => {
+    if (!userId) {
+      console.error('User ID not found');
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_URL}/events/users/${userId}`);
+      const result: EventsApiResponse = await response.json();
+      
+      if (Array.isArray(result.data)) {
+        const eventIds = result.data.map((event: Event) => event.eventId);
+        localStorage.setItem('eventIds', JSON.stringify(eventIds));
+      }
+    } catch (error) {
+      console.error('Error fetching user events:', error);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
     setErrorMessage("");
 
-    const userData = {
-      email,
-      password,
-    };
+    const userData: LoginData = { email, password };
 
     try {
       const res = await fetch(`${API_URL}/login`, {
@@ -38,50 +76,20 @@ const LoginPage = () => {
         throw new Error(`Error en la solicitud: ${errorText}`);
       }
 
-      const data = await res.json();
-      console.log(data);
-      setUserId(data.data.id); // Guardar el ID en el store y en localStorage
-      const fetchUserEvents = async () => {
-        // setLoader(true)
-        const userId = data.data.id
-        if (!userId) {
-          console.error('User ID not found in local storage');
-          return;
-        }
-    
-        try {
-          const response = await fetch(`${API_URL}/events/users/${userId}`);
-          const result = await response.json();
-          console.log('User events:', result);
-          
-          if (Array.isArray(result.data)) {
-            const eventIds = result.data.map(event => event.eventId);
-            console.log(eventIds)
-            localStorage.setItem('eventIds', JSON.stringify(eventIds));
-          }
-        } catch (error) {
-          console.error('Error fetching user events:', error);
-        }
-      };
-    
-      fetchUserEvents();
-      login(data.token); // Guarda el token en el estado global
-      router.push("/home"); // Redirige a la página principal
+      const data: ApiResponse = await res.json();
+      
+      setUserId(data.data.id);
+      await fetchUserEvents(data.data.id);
+      
+      login(data.data.token);
+      router.push("/home");
     } catch (error) {
-      setErrorMessage("Error al iniciar sesión. Verifica tus credenciales."); // Mostrar mensaje de error
+      setErrorMessage("Error al iniciar sesión. Verifica tus credenciales.");
       console.error("An error occurred:", error);
     } finally {
-      setIsLoading(false); // Resetear el estado de carga
+      setIsLoading(false);
     }
   };
-  
-  //*mammamiaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa */
-  // useEffect(() => {
-    
-  // }, []);
-
-  //*mammamiaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa */
-
 
   return (
     <>
@@ -143,7 +151,7 @@ const LoginPage = () => {
               <button
                 type="submit"
                 className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md shadow-sm hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                disabled={isLoading} // Deshabilitar el botón si está en modo de carga
+                disabled={isLoading}
               >
                 Iniciar sesión
               </button>
@@ -162,3 +170,5 @@ const LoginPage = () => {
 };
 
 export default LoginPage;
+
+

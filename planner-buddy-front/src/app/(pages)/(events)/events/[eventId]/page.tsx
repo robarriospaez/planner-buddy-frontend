@@ -1,23 +1,46 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import withAuth from "@/components/withAuth.js";
-import useAuthStore from "@/store/useUserAuthStore.js";
-import useUserStore from "@/store/useUserStore.js";
-import DecisionManager from "@/components/decision.js";
+import withAuth from "@/components/withAuth";
+import useUserStore from "@/store/useUserStore";
+import DecisionManager from "@/components/decision";
 import Cookies from "js-cookie";
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-const EventPage = ({ params }) => {
+interface EventUser {
+  id: string;
+  username: string;
+}
+
+interface Event {
+  name: string;
+  plannedDate: string;
+  userId: string;
+}
+
+interface EventPageProps {
+  params: {
+    eventId: string;
+  };
+}
+
+interface ApiEventUserData {
+  user: {
+    id: string;
+    username: string;
+  };
+}
+
+const EventPage: React.FC<EventPageProps> = ({ params }) => {
   const { eventId } = params;
   const { userId } = useUserStore();
   const router = useRouter();
-  const [eventUsers, setEventUsers] = useState([]);
-  const user = useAuthStore((state) => state.user);
-  const [isCreator, setIsCreator] = useState();
-  const [isLoading, setIsLoading] = useState(true);
-  const [event, setEvent] = useState(null);
-  const [isProcessing, setIsProcessing] = useState(false);
+  const [eventUsers, setEventUsers] = useState<EventUser[]>([]);
+  const [isCreator, setIsCreator] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [event, setEvent] = useState<Event | null>(null);
+  const [isProcessing, setIsProcessing] = useState<boolean>(false);
 
   const goToCategories = () => {
     router.push(`/events/${eventId}/categories`);
@@ -29,13 +52,13 @@ const EventPage = ({ params }) => {
     router.push(`/events/${eventId}`);
   };
 
-  const formatDate = (dateString) => {
+  const formatDate = (dateString: string): string => {
     const date = new Date(dateString);
     const utcDate = new Date(
       Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate())
     );
 
-    const options = {
+    const options: Intl.DateTimeFormatOptions = {
       year: "numeric",
       month: "long",
       day: "numeric",
@@ -52,10 +75,12 @@ const EventPage = ({ params }) => {
         console.log("Event users:", result);
 
         if (Array.isArray(result.data)) {
-          const users = result.data.map((item) => ({
-            id: item.user.id,
-            username: item.user.username,
-          }));
+          const users: EventUser[] = result.data.map(
+            (item: ApiEventUserData) => ({
+              id: item.user.id,
+              username: item.user.username,
+            })
+          );
           setEventUsers(users);
 
           const event = await fetch(`${API_URL}/events/${eventId}`);
@@ -74,10 +99,8 @@ const EventPage = ({ params }) => {
     fetchEventUsers();
   }, [eventId, userId]);
 
-  //*intento de delete event, falta find many users_in_event y eliminar todos los regitros de dicha tabla para evitar conflictos de key */
-
   const deleteEvent = async () => {
-    setIsProcessing(true)
+    setIsProcessing(true);
     try {
       const response = await fetch(`${API_URL}/events/${eventId}`, {
         method: "DELETE",
@@ -96,24 +119,22 @@ const EventPage = ({ params }) => {
 
       const data = await response.json();
       console.log(`Event ${eventId} deleted successfully:`, data);
-      const eventIdsCookie = Cookies.get('eventIds');
+      const eventIdsCookie = Cookies.get("eventIds");
       if (eventIdsCookie) {
-        let eventIds = JSON.parse(eventIdsCookie);
-        // Filtrar el eventId eliminado
-        eventIds = eventIds.filter(id => id != eventId);
-        // Actualizar la cookie
-        Cookies.set('eventIds', JSON.stringify(eventIds), { expires: 7 });
+        let eventIds: string[] = JSON.parse(eventIdsCookie);
+        eventIds = eventIds.filter((id) => id !== eventId);
+        Cookies.set("eventIds", JSON.stringify(eventIds), { expires: 7 });
       }
-      router.push(`/events`)
+      router.push(`/events`);
     } catch (error) {
       console.error(`Error deleting event: ${eventId}`, error);
-      console.error("Error details:", error.message);
+      if (error instanceof Error) {
+        console.error("Error details:", error.message);
+      }
     } finally {
-      setIsProcessing(false)
+      setIsProcessing(false);
     }
   };
-
-  //*intento de leave event */
 
   const leaveEvent = async () => {
     try {
@@ -136,27 +157,31 @@ const EventPage = ({ params }) => {
       handleGoToEvent();
     } catch (error) {
       console.error(`Error leaving event: ${eventId}`, error);
-      console.error("Error details:", error.message);
+      if (error instanceof Error) {
+        console.error("Error details:", error.message);
+      }
     }
   };
 
   return (
-    
     <section className="p-5 bg-gradient-to-b from-violet-600 to-violet-300 min-h-screen w-full flex flex-wrap items-center justify-center rounded-lg">
       {isProcessing && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
-            <div className="relative w-24 h-24 rounded-lg flex items-center justify-center">
-              <div className={`w-full h-full border-4 border-t-transparent rounded-full animate-spin border-violet-500`}></div>
-              <div className={`absolute inset-0 m-auto w-12 h-12 border-4 border-t-transparent rounded-full animate-spin-slow border-violet-300`}></div>
-              <div className={`absolute inset-0 m-auto w-8 h-8 border-4  border-t-transparent rounded-full animate-spin-reverse border-violet-100`}></div>
-            </div>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
+          <div className="relative w-24 h-24 rounded-lg flex items-center justify-center">
+            <div
+              className={`w-full h-full border-4 border-t-transparent rounded-full animate-spin border-violet-500`}
+            ></div>
+            <div
+              className={`absolute inset-0 m-auto w-12 h-12 border-4 border-t-transparent rounded-full animate-spin-slow border-violet-300`}
+            ></div>
+            <div
+              className={`absolute inset-0 m-auto w-8 h-8 border-4  border-t-transparent rounded-full animate-spin-reverse border-violet-100`}
+            ></div>
           </div>
-        )}
-      
+        </div>
+      )}
+
       {isLoading && (
-        //<div className="bg-gradient-to-b from-violet-500 to-violet-200 place-items-center flex-1 flex flex-col h-full min-h-screen items-center">
-        //<section className="py-10 text-center">
-        //<div className="w-full h-screen flex justify-center items-center min-h-full">
         <>
           <div className="relative block w-16 h-16">
             <div className="w-full h-full border-4 border-purple-900 border-t-transparent rounded-full animate-spin"></div>
@@ -164,11 +189,8 @@ const EventPage = ({ params }) => {
             <div className="absolute inset-0 m-auto w-8 h-8 border-4 border-purple-300 border-t-transparent rounded-full animate-spin-reverse"></div>
           </div>
         </>
-        //</div>
-        //</section>
-        //</div>
       )}
-      {!isLoading && (
+      {!isLoading && event && (
         <article className="max-w-4xl w-full mx-auto">
           <h1 className="pt-3 text-xl md:text-3xl lg:text-5xl font-extrabold text-center text-white mb-8 capitalize">
             {event.name}
