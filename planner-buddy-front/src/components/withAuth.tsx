@@ -3,13 +3,8 @@ import { useRouter } from 'next/navigation';
 import useAuthStore from '@/store/useAuthStore';
 import { ComponentType, FC } from 'react';
 
-// Definimos un tipo para las props que esperamos recibir
-interface WithAuthProps {
-  userToken: string | null;
-}
-
 // Definimos el tipo de retorno de la función withAuth
-type WithAuthComponent<P> = FC<P & WithAuthProps> & {
+type WithAuthComponent<P> = FC<P> & {
   displayName?: string;
 };
 
